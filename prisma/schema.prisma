@@ -1,0 +1,323 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Gender {
+  Male
+  Female
+}
+
+enum AccountStatus {
+  PENDING
+  PASS
+  BANNED
+}
+
+enum PostAndEventStatus {
+  PENDING
+  PASS
+  EDITED
+  DELETED
+}
+
+model User {
+  id                Int                @id @default(autoincrement())
+  firstName         String
+  lastName          String
+  username          String             @unique
+  email             String?            @unique
+  mobile            String?            @unique
+  password          String
+  gender            Gender?
+  birthDate         DateTime?          @db.Date
+  profileImage      String?
+  description       String?
+  category          String?
+  interest          String?
+  createdAt         DateTime           @default(now())
+  posts             Post[]
+  userCategorys     UserCategory[]
+  userInterests     UserInterest[]
+  eventLikes        EventLike[]
+  eventComments     EventComment[]
+  eventShares       EventShare[]
+  eventViews        EventView[]
+  joinEvents        JoinEvent[]
+  postLikes         PostLike[]
+  postComments      PostComment[]
+  postShares        PostShare[]
+  postViews         PostView[]
+  followers         Follow[]           @relation("follower")
+  followeds         Follow[]           @relation("followed")
+  reportEvents      ReportEvent[]
+  reportPosts       ReportPost[]
+  reporters         ReportUser[]       @relation("reporter")
+  reporteds         ReportUser[]       @relation("reported")
+  statusReportUsers StatusReportUser[]
+}
+
+model Admin {
+  id                Int                 @id @default(autoincrement())
+  username          String              @unique
+  password          String
+  StatusReportUser  StatusReportUser[]
+  StatusReportEvent StatusReportEvent[]
+  StatusReportPost  StatusReportPost[]
+}
+
+model ReportUser {
+  id            Int      @id @default(autoincrement())
+  reporterId    Int
+  reporter      User     @relation("reporter", fields: [reporterId], references: [id])
+  reportedId    Int
+  reported      User     @relation("reported", fields: [reportedId], references: [id])
+  reportMessage String
+  reportedAt    DateTime @default(now())
+  checkReport   Boolean  @default(false)
+}
+
+model StatusReportUser {
+  id            Int           @id @default(autoincrement())
+  userId        Int
+  user          User          @relation(fields: [userId], references: [id])
+  totalReport   Int
+  status        AccountStatus @default(PENDING)
+  messageToUser String
+  adminId       Int
+  admin         Admin         @relation(fields: [adminId], references: [id])
+}
+
+model Category {
+  id             Int             @id @default(autoincrement())
+  categoryName   String          @unique
+  userCategorys  UserCategory[]
+  userInterests  UserInterest[]
+  eventCategorys EventCategory[]
+  postCategorys  PostCategory[]
+}
+
+model UserCategory {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+}
+
+model UserInterest {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  interestId Int
+  interest   Category @relation(fields: [interestId], references: [id])
+}
+
+model Event {
+  id                 Int                 @id @default(autoincrement())
+  name               String              @unique
+  description        String?
+  createdAt          DateTime            @default(now())
+  totalView          Int                 @default(0)
+  totalLike          Int                 @default(0)
+  totalShare         Int                 @default(0)
+  totalComment       Int                 @default(0)
+  category           String?
+  eventSchedules     EventSchedule[]
+  eventCategorys     EventCategory[]
+  eventLikes         EventLike[]
+  eventComments      EventComment[]
+  eventShares        EventShare[]
+  eventViews         EventView[]
+  joinEvents         JoinEvent[]
+  reportEvents       ReportEvent[]
+  statusReportEvents StatusReportEvent[]
+}
+
+model EventSchedule {
+  id                   Int      @id @default(autoincrement())
+  eventId              Int
+  event                Event    @relation(fields: [eventId], references: [id])
+  nameSchedule         String?
+  postDetailScheduleId Int
+  postDetailSchedule   Post     @relation(fields: [postDetailScheduleId], references: [id])
+  startAt              DateTime
+  finishAt             DateTime
+}
+
+model EventCategory {
+  id         Int      @id @default(autoincrement())
+  eventId    Int
+  event      Event    @relation(fields: [eventId], references: [id])
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+}
+
+model JoinEvent {
+  id       Int      @id @default(autoincrement())
+  eventId  Int
+  event    Event    @relation(fields: [eventId], references: [id])
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id])
+  joinedAt DateTime @default(now())
+}
+
+model EventLike {
+  id      Int      @id @default(autoincrement())
+  eventId Int
+  event   Event    @relation(fields: [eventId], references: [id])
+  userId  Int
+  user    User     @relation(fields: [userId], references: [id])
+  likedAt DateTime @default(now())
+}
+
+model EventComment {
+  id          Int      @id @default(autoincrement())
+  eventId     Int
+  event       Event    @relation(fields: [eventId], references: [id])
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  comment     String
+  commentedAt DateTime @default(now())
+}
+
+model EventShare {
+  id       Int      @id @default(autoincrement())
+  eventId  Int
+  event    Event    @relation(fields: [eventId], references: [id])
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id])
+  sharedAt DateTime @default(now())
+}
+
+model EventView {
+  id       Int      @id @default(autoincrement())
+  eventId  Int
+  event    Event    @relation(fields: [eventId], references: [id])
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id])
+  viewedAt DateTime @default(now())
+}
+
+model ReportEvent {
+  id            Int      @id @default(autoincrement())
+  eventId       Int
+  event         Event    @relation(fields: [eventId], references: [id])
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  reportMessage String
+  reportedAt    DateTime @default(now())
+  checkReport   Boolean  @default(false)
+}
+
+model StatusReportEvent {
+  id            Int                @id @default(autoincrement())
+  eventId       Int
+  event         Event              @relation(fields: [eventId], references: [id])
+  totalReport   Int
+  status        PostAndEventStatus @default(PENDING)
+  messageToUser String
+  adminId       Int
+  admin         Admin              @relation(fields: [adminId], references: [id])
+}
+
+model Post {
+  id                Int                @id @default(autoincrement())
+  message           String?
+  image             String?
+  createdAt         DateTime           @default(now())
+  totalView         Int                @default(0)
+  totalLike         Int                @default(0)
+  totalShare        Int                @default(0)
+  totalComment      Int                @default(0)
+  userId            Int
+  linkScheduleId    Int
+  user              User               @relation(fields: [userId], references: [id])
+  postCategorys     PostCategory[]
+  postLikes         PostLike[]
+  postComments      PostComment[]
+  postShares        PostShare[]
+  postViews         PostView[]
+  eventSchedules    EventSchedule[]
+  reportPosts       ReportPost[]
+  statusReportPosts StatusReportPost[]
+}
+
+model PostCategory {
+  id         Int      @id @default(autoincrement())
+  postId     Int
+  post       Post     @relation(fields: [postId], references: [id])
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+}
+
+model PostLike {
+  id      Int      @id @default(autoincrement())
+  postId  Int
+  post    Post     @relation(fields: [postId], references: [id])
+  userId  Int
+  user    User     @relation(fields: [userId], references: [id])
+  likedAt DateTime @default(now())
+}
+
+model PostComment {
+  id          Int      @id @default(autoincrement())
+  postId      Int
+  post        Post     @relation(fields: [postId], references: [id])
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  comment     String
+  commentedAt DateTime @default(now())
+}
+
+model PostShare {
+  id       Int      @id @default(autoincrement())
+  postId   Int
+  post     Post     @relation(fields: [postId], references: [id])
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id])
+  sharedAt DateTime @default(now())
+}
+
+model PostView {
+  id       Int      @id @default(autoincrement())
+  postId   Int
+  post     Post     @relation(fields: [postId], references: [id])
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id])
+  viewedAt DateTime @default(now())
+}
+
+model ReportPost {
+  id            Int      @id @default(autoincrement())
+  postId        Int
+  post          Post     @relation(fields: [postId], references: [id])
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  reportMessage String
+  reportedAt    DateTime @default(now())
+  checkReport   Boolean  @default(false)
+}
+
+model StatusReportPost {
+  id            Int                @id @default(autoincrement())
+  postId        Int
+  post          Post               @relation(fields: [postId], references: [id])
+  totalReport   Int
+  status        PostAndEventStatus @default(PENDING)
+  messageToUser String
+  adminId       Int
+  admin         Admin              @relation(fields: [adminId], references: [id])
+}
+
+model Follow {
+  id         Int  @id @default(autoincrement())
+  followerId Int
+  follower   User @relation("follower", fields: [followerId], references: [id])
+  followedId Int
+  followed   User @relation("followed", fields: [followedId], references: [id])
+}
