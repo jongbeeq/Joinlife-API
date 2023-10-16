@@ -20,8 +20,8 @@ const registerSchema = Joi.object({
         is: Joi.string().email(),
         then: Joi.string().default(Joi.ref('emailOrMobile'))
     }),
-    birthDate: Joi.string().trim(),
-    gender: Joi.string().trim(),
+    birthDate: Joi.string().trim().allow(null, ''),
+    gender: Joi.string().trim().allow(null, ''),
 })
 
 exports.registerSchema = registerSchema

@@ -7,11 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Gender {
-  Male
-  Female
-}
-
 enum AccountStatus {
   PENDING
   PASS
@@ -33,14 +28,12 @@ model User {
   email             String?            @unique
   mobile            String?            @unique
   password          String
-  gender            Gender?
+  gender            String?
   birthDate         DateTime?          @db.Date
   profileImage      String?
   description       String?
-  category          String?
-  interest          String?
   createdAt         DateTime           @default(now())
-  posts             Post[]
+  posts             Posts[]
   userCategorys     UserCategory[]
   userInterests     UserInterest[]
   eventLikes        EventLike[]
@@ -102,25 +95,26 @@ model Category {
 }
 
 model UserCategory {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id])
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  categoryName String
+  category     Category @relation(fields: [categoryName], references: [categoryName])
 }
 
 model UserInterest {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id])
-  interestId Int
-  interest   Category @relation(fields: [interestId], references: [id])
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  interestName String
+  interest     Category @relation(fields: [interestName], references: [categoryName])
 }
 
 model Event {
   id                 Int                 @id @default(autoincrement())
   name               String              @unique
-  description        String?
+  message            String?
+  eventfiles         EventFile[]
   createdAt          DateTime            @default(now())
   totalView          Int                 @default(0)
   totalLike          Int                 @default(0)
@@ -138,23 +132,29 @@ model Event {
   statusReportEvents StatusReportEvent[]
 }
 
+model EventFile {
+  id     Int     @id @default(autoincrement())
+  file   String
+  events Event[]
+}
+
 model EventSchedule {
   id                   Int      @id @default(autoincrement())
   eventId              Int
   event                Event    @relation(fields: [eventId], references: [id])
   nameSchedule         String?
   postDetailScheduleId Int
-  postDetailSchedule   Post     @relation(fields: [postDetailScheduleId], references: [id])
+  postDetailSchedule   Posts    @relation(fields: [postDetailScheduleId], references: [id])
   startAt              DateTime
   finishAt             DateTime
 }
 
 model EventCategory {
-  id         Int      @id @default(autoincrement())
-  eventId    Int
-  event      Event    @relation(fields: [eventId], references: [id])
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
+  id           Int      @id @default(autoincrement())
+  eventId      Int
+  event        Event    @relation(fields: [eventId], references: [id])
+  categoryName String
+  category     Category @relation(fields: [categoryName], references: [categoryName])
 }
 
 model JoinEvent {
@@ -225,17 +225,15 @@ model StatusReportEvent {
   admin         Admin              @relation(fields: [adminId], references: [id])
 }
 
-model Post {
+model Posts {
   id                Int                @id @default(autoincrement())
   message           String?
-  image             String?
   createdAt         DateTime           @default(now())
-  totalView         Int                @default(0)
-  totalLike         Int                @default(0)
-  totalShare        Int                @default(0)
-  totalComment      Int                @default(0)
+  totalView         Int?               @default(0)
+  totalLike         Int?               @default(0)
+  totalShare        Int?               @default(0)
+  totalComment      Int?               @default(0)
   userId            Int
-  linkScheduleId    Int
   user              User               @relation(fields: [userId], references: [id])
   postCategorys     PostCategory[]
   postLikes         PostLike[]
@@ -245,20 +243,27 @@ model Post {
   eventSchedules    EventSchedule[]
   reportPosts       ReportPost[]
   statusReportPosts StatusReportPost[]
+  postFiles         PostFile[]
+}
+
+model PostFile {
+  id    Int     @id @default(autoincrement())
+  file  String
+  posts Posts[]
 }
 
 model PostCategory {
-  id         Int      @id @default(autoincrement())
-  postId     Int
-  post       Post     @relation(fields: [postId], references: [id])
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
+  id           Int      @id @default(autoincrement())
+  postId       Int
+  post         Posts    @relation(fields: [postId], references: [id])
+  categoryName String
+  category     Category @relation(fields: [categoryName], references: [categoryName])
 }
 
 model PostLike {
   id      Int      @id @default(autoincrement())
   postId  Int
-  post    Post     @relation(fields: [postId], references: [id])
+  post    Posts    @relation(fields: [postId], references: [id])
   userId  Int
   user    User     @relation(fields: [userId], references: [id])
   likedAt DateTime @default(now())
@@ -267,7 +272,7 @@ model PostLike {
 model PostComment {
   id          Int      @id @default(autoincrement())
   postId      Int
-  post        Post     @relation(fields: [postId], references: [id])
+  post        Posts    @relation(fields: [postId], references: [id])
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
   comment     String
@@ -277,7 +282,7 @@ model PostComment {
 model PostShare {
   id       Int      @id @default(autoincrement())
   postId   Int
-  post     Post     @relation(fields: [postId], references: [id])
+  post     Posts    @relation(fields: [postId], references: [id])
   userId   Int
   user     User     @relation(fields: [userId], references: [id])
   sharedAt DateTime @default(now())
@@ -286,7 +291,7 @@ model PostShare {
 model PostView {
   id       Int      @id @default(autoincrement())
   postId   Int
-  post     Post     @relation(fields: [postId], references: [id])
+  post     Posts    @relation(fields: [postId], references: [id])
   userId   Int
   user     User     @relation(fields: [userId], references: [id])
   viewedAt DateTime @default(now())
@@ -295,7 +300,7 @@ model PostView {
 model ReportPost {
   id            Int      @id @default(autoincrement())
   postId        Int
-  post          Post     @relation(fields: [postId], references: [id])
+  post          Posts    @relation(fields: [postId], references: [id])
   userId        Int
   user          User     @relation(fields: [userId], references: [id])
   reportMessage String
@@ -306,7 +311,7 @@ model ReportPost {
 model StatusReportPost {
   id            Int                @id @default(autoincrement())
   postId        Int
-  post          Post               @relation(fields: [postId], references: [id])
+  post          Posts              @relation(fields: [postId], references: [id])
   totalReport   Int
   status        PostAndEventStatus @default(PENDING)
   messageToUser String

@@ -14,7 +14,9 @@ exports.register = async (req, res, next) => {
         }
         value.password = await bcrypt.hash(value.password, 12);
         console.log(value.birthDate)
-        value.birthDate = value.birthDate + "T00:00:00Z"
+        if (value.birthDate) {
+            value.birthDate = value.birthDate + "T00:00:00Z"
+        }
         console.log(value.birthDate)
         const user = await prisma.user.create({
             data: value
@@ -39,20 +41,34 @@ exports.login = async (req, res, next) => {
     try {
         const { value, error } = loginSchema.validate(req.body);
         if (error) {
-            return next(error);
+            const messageError = error.details.reduce((acc, el) => {
+                const { message, path } = el
+                acc[path[0]] = message
+                return acc
+            }, {})
+
+            return next(createError(messageError, 400));
         }
         const user = await prisma.user.findFirst({
             where: {
                 username: value.username
             }
         });
+        const messageError = {
+            username: "",
+            password: ""
+        }
         if (!user) {
-            return next(createError('invalid credential', 400));
+            messageError.username = 'Username is not found in system'
+            console.log(messageError)
+            return next(createError(messageError, 400));
         }
 
         const isMatch = await bcrypt.compare(value.password, user.password);
         if (!isMatch) {
-            return next(createError('invalid credential', 400));
+            messageError.password = 'Password is invalid'
+            // console.log(messageError)
+            return next(createError(messageError, 400));
         }
 
         const payload = { userId: user.id };
@@ -68,4 +84,8 @@ exports.login = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+};
+
+exports.getMe = async (req, res, next) => {
+    res.status(200).json({ user: req.user });
 };
