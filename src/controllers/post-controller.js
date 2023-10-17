@@ -14,21 +14,21 @@ exports.createPost = async (req, res, next) => {
             return next(createError('Message or image is required', 400))
         }
 
-        const pendingImages = await req.files.map(file => uploadToCloud(file.path))
+        const pendingFiles = await req.files.map(file => uploadToCloud(file.path))
 
-        const images = await Promise.all(pendingImages)
+        const files = await Promise.all(pendingFiles)
 
-        const createImages = images.map(path => {
-            const imageRow = {}
-            imageRow.file = path
-            return imageRow
+        const createFiles = files.map(path => {
+            const fileRow = {}
+            fileRow.file = path
+            return fileRow
         })
 
         const contentPost = await prisma.posts.create({
             data: {
                 userId: req.user.id,
                 message: message,
-                postFiles: { create: createImages }
+                postFiles: { create: createFiles }
             },
             include: {
                 user: {

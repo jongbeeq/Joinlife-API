@@ -1,11 +1,10 @@
 const prisma = require("../models/prisma")
 const selectCategory = require("../models/selectCategory")
+const { uploadToCloud } = require("../utils/cloudinary-service")
 
 exports.updateProfile = async (req, res, next) => {
     try {
         const { description, category, interest } = req.body
-        console.log("🚀 ~ file: user-controller.js:7 ~ exports.updateProfile= ~ req.body:", req.body.category)
-        console.log("🚀 ~ file: user-controller.js:7 ~ exports.updateProfile= ~ req.body:", req.file)
 
         const responseUser = {}
 
@@ -22,18 +21,18 @@ exports.updateProfile = async (req, res, next) => {
         }
 
         if (req.file) {
+            const profileImage = await uploadToCloud(req.file.path)
             const userFile = await prisma.user.update({
                 data: {
-                    profileImage: req.file.path
+                    profileImage: profileImage
                 },
                 where: {
                     id: req.user.id
                 },
             })
-            responseUser.file = userFile
+            responseUser.profileImage = userFile
         }
 
-        console.log("🚀 ~ file: user-controller.js:35 ~ exports.updateProfile= ~ responseUser:", responseUser)
         responseUser.category = await Promise.resolve(selectCategory(req.user.id, category, "userCategory"))
         responseUser.interest = await Promise.resolve(selectCategory(req.user.id, interest, "userInterest"))
 
