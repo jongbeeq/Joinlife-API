@@ -6,6 +6,9 @@ const createError = require("../utils/create-error")
 exports.createPost = async (req, res, next) => {
     try {
         const { message, category } = req.body
+        console.log("🚀 ~ file: post-controller.js:7 ~ exports.createPost= ~ req:", req.files)
+        console.log("🚀 ~ file: post-controller.js:9 ~ exports.createPost= ~ req.body:", req.body)
+
 
         if ((!message || !message.trim()) && !req.files) {
             return next(createError('Message or image is required', 400))

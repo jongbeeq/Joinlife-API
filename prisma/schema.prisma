@@ -106,8 +106,8 @@ model UserInterest {
   id           Int      @id @default(autoincrement())
   userId       Int
   user         User     @relation(fields: [userId], references: [id])
-  interestName String
-  interest     Category @relation(fields: [interestName], references: [categoryName])
+  categoryName String
+  interest     Category @relation(fields: [categoryName], references: [categoryName])
 }
 
 model Event {

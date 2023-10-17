@@ -37,12 +37,21 @@ RESPONSE
 401 { message: String}
 500 { message: String}
 
+GET CATEGORY
+GET /category
+200 {category: [String, ...]}
+400 { message: String}
+500 { message: String}
 
-
-
-
-
-
+CREATE EVENT
+POST /event/
+HEADER AUTHORIZATION Bearer ACCESS_TOKEN
+BODY name? , message? , category?, file?
+RESPONSE
+201 {message: String}
+400 {message: String}
+401 {message: String}
+500 {message: String}
 
 
 

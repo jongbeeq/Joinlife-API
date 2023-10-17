@@ -7,8 +7,10 @@ const rateLimitMiddleware = require('./middlwares/rate-limit');
 const notFoundMiddleWare = require('./middlwares/not-found')
 const errorMiddleware = require('./middlwares/error');
 const authUserRoute = require('./routes/auth-user-route')
-const postRoute = require('./routes/post-route')
+const categoryRoute = require('./routes/category-route')
 const userRoute = require('./routes/user-route')
+const eventRoute = require('./routes/event-route')
+const postRoute = require('./routes/post-route')
 
 const app = express()
 
@@ -17,7 +19,9 @@ app.use(morgan('dev'));
 app.use(rateLimitMiddleware);
 app.use(express.json())
 
+app.use('/category', categoryRoute)
 app.use('/auth', authUserRoute)
+app.use('/event', eventRoute)
 app.use('/post', postRoute)
 app.use('/user', userRoute)
 
