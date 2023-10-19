@@ -1,0 +1,19 @@
+##### err Prisma #####
+PrismaClientKnownRequestError:
+Invalid `prisma.user.create()` invocation in
+C:\Users\Titivute\cc15\MyProject\MyProject_Joinlife\JoinLife-Api\src\controllers\auth-user-controllers.js:21:40
+
+  18     value.birthDate = value.birthDate + "T00:00:00Z"
+  19 }
+  20 console.log(value.birthDate)
+→ 21 const user = await prisma.user.create(
+Unique constraint failed on the constraint: `User_username_key`
+    at Cn.handleRequestError (C:\Users\Titivute\cc15\MyProject\MyProject_Joinlife\JoinLife-Api\node_modules\.pnpm\@prisma+client@5.4.2_prisma@5.4.2\node_modules\@prisma\client\runtime\library.js:123:6817)
+    at Cn.handleAndLogRequestError (C:\Users\Titivute\cc15\MyProject\MyProject_Joinlife\JoinLife-Api\node_modules\.pnpm\@prisma+client@5.4.2_prisma@5.4.2\node_modules\@prisma\client\runtime\library.js:123:6206)
+    at Cn.request (C:\Users\Titivute\cc15\MyProject\MyProject_Joinlife\JoinLife-Api\node_modules\.pnpm\@prisma+client@5.4.2_prisma@5.4.2\node_modules\@prisma\client\runtime\library.js:123:5926)
+    at async l (C:\Users\Titivute\cc15\MyProject\MyProject_Joinlife\JoinLife-Api\node_modules\.pnpm\@prisma+client@5.4.2_prisma@5.4.2\node_modules\@prisma\client\runtime\library.js:128:9968)
+    at async exports.register (C:\Users\Titivute\cc15\MyProject\MyProject_Joinlife\JoinLife-Api\src\controllers\auth-user-controllers.js:21:22) {
+  code: 'P2002',
+  clientVersion: '5.4.2',
+  meta: { target: 'User_username_key' }
+}

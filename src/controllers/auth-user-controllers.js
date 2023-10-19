@@ -33,7 +33,8 @@ exports.register = async (req, res, next) => {
         delete user.password
         res.status(201).json({ accessToken, user })
     } catch (err) {
-        next(err)
+        const errorDBMessage = err.meta.target.split("_")[1] + " is already in use"
+        next(createError(errorDBMessage, 500))
     }
 }
 

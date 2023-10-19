@@ -9,6 +9,7 @@ exports.updateProfile = async (req, res, next) => {
         const responseUser = {}
 
         if (description) {
+            console.log(req.body)
             const userDescription = await prisma.user.update({
                 data: {
                     description: description
@@ -16,26 +17,33 @@ exports.updateProfile = async (req, res, next) => {
                 where: {
                     id: req.user.id
                 },
+                select: {
+                    description: true
+                }
             })
-            responseUser.description = userDescription
+            responseUser.description = userDescription.description
         }
 
         if (req.file) {
+            console.log(req.file)
             const profileImage = await uploadToCloud(req.file.path)
-            const userFile = await prisma.user.update({
+            const userProfileImage = await prisma.user.update({
                 data: {
                     profileImage: profileImage
                 },
                 where: {
                     id: req.user.id
                 },
+                select: {
+                    profileImage: true
+                }
             })
-            responseUser.profileImage = userFile
+            responseUser.profileImage = userProfileImage.profileImage
         }
 
         responseUser.category = await Promise.resolve(selectCategory(req.user.id, category, "userCategory"))
         responseUser.interest = await Promise.resolve(selectCategory(req.user.id, interest, "userInterest"))
-
+        console.log("success")
         res.status(200).json(responseUser)
     } catch (err) {
         next(err)
