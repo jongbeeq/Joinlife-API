@@ -6,45 +6,39 @@ exports.updateProfile = async (req, res, next) => {
     try {
         const { description, category, interest } = req.body
 
-        const responseUser = {}
+        const updateObj = {}
+        let userProfileUpdate
 
         if (description) {
-            console.log(req.body)
-            const userDescription = await prisma.user.update({
-                data: {
-                    description: description
-                },
-                where: {
-                    id: req.user.id
-                },
-                select: {
-                    description: true
-                }
-            })
-            responseUser.description = userDescription.description
+            console.log("🚀 ~ file: user-controller.js:14 ~ exports.updateProfile= ~ description:", description)
+            updateObj.description = description
         }
 
         if (req.file) {
-            console.log(req.file)
-            const profileImage = await uploadToCloud(req.file.path)
-            const userProfileImage = await prisma.user.update({
+            console.log("🚀 ~ file: user-controller.js:19 ~ exports.updateProfile= ~ req.file:", req.file)
+            updateObj.profileImage = await uploadToCloud(req.file.path)
+        }
+
+        if (Object.keys(updateObj).length !== 0) {
+            console.log("🚀 ~ file: user-controller.js:26 ~ exports.updateProfile= ~ updateObj:", updateObj)
+            console.log("🚀 ~ file: user-controller.js:24 ~ exports.updateProfile= ~ Object.keys(updateObj).length:", Object.keys(updateObj).length)
+            const userData = await prisma.user.update({
                 data: {
-                    profileImage: profileImage
+                    ...updateObj
                 },
                 where: {
                     id: req.user.id
-                },
-                select: {
-                    profileImage: true
                 }
             })
-            responseUser.profileImage = userProfileImage.profileImage
+            userProfileUpdate = userData
         }
 
-        responseUser.category = await Promise.resolve(selectCategory(req.user.id, category, "userCategory"))
-        responseUser.interest = await Promise.resolve(selectCategory(req.user.id, interest, "userInterest"))
-        console.log("success")
-        res.status(200).json(responseUser)
+        userProfileUpdate.category = await Promise.resolve(selectCategory(req.user.id, category, "userCategory"))
+        userProfileUpdate.interest = await Promise.resolve(selectCategory(req.user.id, interest, "userInterest"))
+
+        delete userProfileUpdate.password
+
+        res.status(200).json(userProfileUpdate)
     } catch (err) {
         next(err)
     }
