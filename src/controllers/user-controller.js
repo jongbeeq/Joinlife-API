@@ -53,6 +53,8 @@ exports.getUserById = async (req, res, next) => {
             return next(error)
         }
         const userId = +req.params.userId;
+        const a = await prisma.event.findMany()
+        // console.log("🚀 ~ file: user-controller.js:57 ~ exports.getUserById= ~ a:", a)
         const profile = await prisma.user.findUnique({
             where: {
                 id: userId
@@ -73,6 +75,8 @@ exports.getUserById = async (req, res, next) => {
                 joinEvents: true,
             }
         })
+
+        console.log("🚀 ~ file: user-controller.js:85 ~ exports.getUserById= ~ b:", b)
 
         delete profile.password
         console.log(profile)
