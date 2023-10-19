@@ -13,4 +13,10 @@ router.patch(
     userMiddleware.updateProfile,
 )
 
+router.get(
+    '/:userId',
+    authenticateMiddleware,
+    userMiddleware.getUserById
+)
+
 module.exports = router

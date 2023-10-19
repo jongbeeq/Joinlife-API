@@ -1,6 +1,7 @@
 const prisma = require("../models/prisma")
 const selectCategory = require("../models/selectCategory")
 const { uploadToCloud } = require("../utils/cloudinary-service")
+const { checkUserIdSchema } = require('../validators/user-validator')
 
 exports.updateProfile = async (req, res, next) => {
     try {
@@ -39,6 +40,43 @@ exports.updateProfile = async (req, res, next) => {
         delete userProfileUpdate.password
 
         res.status(200).json(userProfileUpdate)
+    } catch (err) {
+        next(err)
+    }
+}
+
+
+exports.getUserById = async (req, res, next) => {
+    try {
+        const { error } = checkUserIdSchema.validate(req.params)
+        if (error) {
+            return next(error)
+        }
+        const userId = +req.params.userId;
+        const profile = await prisma.user.findUnique({
+            where: {
+                id: userId
+            },
+            include: {
+                userCategorys: {
+                    select: {
+                        categoryName: true
+                    }
+                },
+                userInterests: {
+                    select: {
+                        categoryName: true
+                    }
+                },
+                posts: true,
+                // event: true,
+                joinEvents: true,
+            }
+        })
+
+        delete profile.password
+        console.log(profile)
+        res.status(200).json(profile)
     } catch (err) {
         next(err)
     }

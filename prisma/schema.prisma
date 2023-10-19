@@ -52,6 +52,7 @@ model User {
   reporters         ReportUser[]       @relation("reporter")
   reporteds         ReportUser[]       @relation("reported")
   statusReportUsers StatusReportUser[]
+  events            Event[]
 }
 
 model Admin {
@@ -121,6 +122,8 @@ model Event {
   totalShare         Int                 @default(0)
   totalComment       Int                 @default(0)
   category           String?
+  userId             Int
+  user               User                @relation(fields: [userId], references: [id])
   eventSchedules     EventSchedule[]
   eventCategorys     EventCategory[]
   eventLikes         EventLike[]
