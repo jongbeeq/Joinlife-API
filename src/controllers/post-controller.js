@@ -6,15 +6,18 @@ const createError = require("../utils/create-error")
 exports.createPost = async (req, res, next) => {
     try {
         const { message, category } = req.body
-        console.log("🚀 ~ file: post-controller.js:7 ~ exports.createPost= ~ req:", req.files)
-        console.log("🚀 ~ file: post-controller.js:9 ~ exports.createPost= ~ req.body:", req.body)
-
 
         if ((!message || !message.trim()) && !req.files) {
             return next(createError('Message or image is required', 400))
         }
 
-        const pendingFiles = await req.files.map(file => uploadToCloud(file.path))
+        const pendingFiles = await req.files.map(
+            file => {
+                console.log(file.mimetype)
+                const fileType = file.mimetype.split('/')[0]
+                return uploadToCloud(file.path, fileType)
+            }
+        )
 
         const files = await Promise.all(pendingFiles)
 
@@ -46,7 +49,6 @@ exports.createPost = async (req, res, next) => {
         })
 
         contentPost.postFiles = contentPost.postFiles.map(postFile => postFile.file)
-        console.log("🚀 ~ file: post-controller.js:46 ~ exports.createPost= ~ contentPost:", contentPost)
 
         const notFoundCategoryMessage = ": Category Not Found"
         const pendingCategoryFound = category.map(async nameCategory => {
