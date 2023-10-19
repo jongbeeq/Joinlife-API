@@ -5,6 +5,7 @@ const selectCategory = async (idItem, category, tableItem) => {
         console.log("🚀 ~ file: selectCategory.js:4 ~ selectCategory ~ category:", category)
 
         if (category) {
+
             await prisma[tableItem].deleteMany({
                 where: {
                     userId: idItem
