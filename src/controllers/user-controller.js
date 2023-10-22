@@ -8,7 +8,6 @@ exports.updateProfile = async (req, res, next) => {
         const { description, category, interest } = req.body
 
         const updateObj = {}
-        let userProfileUpdate
 
         if (description) {
             console.log("🚀 ~ file: user-controller.js:14 ~ exports.updateProfile= ~ description:", description)
@@ -31,8 +30,13 @@ exports.updateProfile = async (req, res, next) => {
                     id: req.user.id
                 }
             })
-            userProfileUpdate = userData
         }
+
+        const userProfileUpdate = await prisma.user.findUnique({
+            where: {
+                id: req.user.id
+            }
+        })
 
         userProfileUpdate.category = await Promise.resolve(selectCategory(req.user.id, category, "userCategory"))
         userProfileUpdate.interest = await Promise.resolve(selectCategory(req.user.id, interest, "userInterest"))
@@ -53,8 +57,6 @@ exports.getUserById = async (req, res, next) => {
             return next(error)
         }
         const userId = +req.params.userId;
-        const a = await prisma.event.findMany()
-        // console.log("🚀 ~ file: user-controller.js:57 ~ exports.getUserById= ~ a:", a)
         const profile = await prisma.user.findUnique({
             where: {
                 id: userId
@@ -71,15 +73,56 @@ exports.getUserById = async (req, res, next) => {
                     }
                 },
                 posts: true,
-                // event: true,
                 joinEvents: true,
             }
         })
 
-        console.log("🚀 ~ file: user-controller.js:85 ~ exports.getUserById= ~ b:", b)
+        const event = await prisma.event.findMany({
+            where: {
+                userId: userId
+            }
+        })
+
+        const followingOther = await prisma.follow.findMany({
+            where: {
+                followerId: userId
+            },
+            select: {
+                followedId: true
+            },
+        })
+
+        const followedByOther = await prisma.follow.findMany({
+            where: {
+                followedId: userId
+            },
+            select: {
+                followerId: true
+            }
+        })
+
+        const followingOtherArray = followingOther.map(el => el.followedId)
+        const followedByOtherArray = followedByOther.map(el => el.followerId)
+
+        const profileFollowedByOther = await prisma.user.findMany({
+            where: {
+                id: { in: [...followedByOtherArray] }
+            }
+        })
+
+        const profileFollowingOther = await prisma.user.findMany({
+            where: {
+                id: { in: [...followingOtherArray] }
+            }
+        })
 
         delete profile.password
-        console.log(profile)
+        profile.userCategorys = profile.userCategorys.map(el => el.categoryName)
+        profile.userInterests = profile.userInterests.map(el => el.categoryName)
+        profile.event = event
+        profile.following = profileFollowingOther
+        profile.followed = profileFollowedByOther
+        console.log("🚀 ~ file: user-controller.js:87 ~ exports.getUserById= ~ profile:", profile)
         res.status(200).json(profile)
     } catch (err) {
         next(err)

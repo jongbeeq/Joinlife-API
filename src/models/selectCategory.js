@@ -3,8 +3,11 @@ const prisma = require("../models/prisma")
 const selectCategory = async (idItem, category, tableItem) => {
     try {
         console.log("🚀 ~ file: selectCategory.js:4 ~ selectCategory ~ category:", category)
+        console.log("🚀 ~ file: selectCategory.js:4 ~ selectCategory ~ category:", typeof (category))
 
         if (category) {
+            const categorySelected = category.filter(el => el !== "null")
+            console.log("🚀 ~ file: selectCategory.js:10 ~ selectCategory ~ categorySelected:", categorySelected)
 
             await prisma[tableItem].deleteMany({
                 where: {
@@ -13,7 +16,7 @@ const selectCategory = async (idItem, category, tableItem) => {
             })
 
             await prisma[tableItem].createMany({
-                data: category.map(category => {
+                data: categorySelected.map(category => {
                     const inputCategory = {
                         userId: idItem
                     }

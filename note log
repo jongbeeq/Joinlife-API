@@ -2363,3 +2363,95 @@
   [Symbol(kTrailers)]: null,
   [Symbol(kTrailersCount)]: 0
 }
+
+
+
+###################################
+{
+    "id": 3,
+    "firstName": "test03",
+    "lastName": "test03",
+    "username": "test03",
+    "email": "test03@email.com",
+    "mobile": null,
+    "gender": null,
+    "birthDate": null,
+    "profileImage": "https://res.cloudinary.com/dsldd3uhx/image/upload/v1697738547/x5tmqmdojpe2n3hbnuyr.jpg",
+    "description": "Hello Kitty",
+    "createdAt": "2023-10-19T17:49:03.412Z",
+    "userCategorys": [
+        "Art",
+        "Book",
+        "Healthy",
+        "Money",
+        "Movie"
+    ],
+    "userInterests": [
+        "Healthy",
+        "Money",
+        "Movie"
+    ],
+    "posts": [],
+    "joinEvents": [],
+    "event": [],
+    "following": [
+        {
+            "id": 1,
+            "firstName": "test01",
+            "lastName": "test01",
+            "username": "test01",
+            "email": "test01@email.com",
+            "mobile": null,
+            "password": "$2a$12$oC5OGO7KoCL5A2aVvS.TV.HFfgltzuEWOK74Nb0NvaaOLpLptFtwe",
+            "gender": null,
+            "birthDate": null,
+            "profileImage": null,
+            "description": null,
+            "createdAt": "2023-10-19T16:22:09.318Z"
+        },
+        {
+            "id": 2,
+            "firstName": "test02",
+            "lastName": "test02",
+            "username": "test02",
+            "email": "test02@email.com",
+            "mobile": null,
+            "password": "$2a$12$9tK5EdUO6ZAqtOQpzdiE8uFkWWnAD0VTUdHBpwuvvlSKk5dcds0pO",
+            "gender": null,
+            "birthDate": null,
+            "profileImage": null,
+            "description": null,
+            "createdAt": "2023-10-19T17:20:22.219Z"
+        }
+    ],
+    "followed": [
+        {
+            "id": 1,
+            "firstName": "test01",
+            "lastName": "test01",
+            "username": "test01",
+            "email": "test01@email.com",
+            "mobile": null,
+            "password": "$2a$12$oC5OGO7KoCL5A2aVvS.TV.HFfgltzuEWOK74Nb0NvaaOLpLptFtwe",
+            "gender": null,
+            "birthDate": null,
+            "profileImage": null,
+            "description": null,
+            "createdAt": "2023-10-19T16:22:09.318Z"
+        },
+        {
+            "id": 2,
+            "firstName": "test02",
+            "lastName": "test02",
+            "username": "test02",
+            "email": "test02@email.com",
+            "mobile": null,
+            "password": "$2a$12$9tK5EdUO6ZAqtOQpzdiE8uFkWWnAD0VTUdHBpwuvvlSKk5dcds0pO",
+            "gender": null,
+            "birthDate": null,
+            "profileImage": null,
+            "description": null,
+            "createdAt": "2023-10-19T17:20:22.219Z"
+        }
+    ]
+}
