@@ -120,6 +120,7 @@ exports.getAllPost = async (req, res, next) => {
                 }
             ],
             where: {
+                id: 102,
                 postFiles: {
                     some: {
                         id: {
@@ -143,6 +144,16 @@ exports.getAllPost = async (req, res, next) => {
                 postCategorys: {
                     select: {
                         categoryName: true
+                    }
+                },
+                postComments: {
+                    include: {
+                        user: {
+                            select: {
+                                username: true,
+                                profileImage: true,
+                            }
+                        }
                     }
                 }
             }
