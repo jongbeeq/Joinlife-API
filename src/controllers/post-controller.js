@@ -5,16 +5,12 @@ const createError = require("../utils/create-error")
 
 exports.createPost = async (req, res, next) => {
     try {
-        console.log("🚀 ~ file: post-controller.js:12 ~ exports.createPost= ~ req.files:", req.files)
-        console.log("🚀 ~ file: post-controller.js:12 ~ exports.createPost= ~ req.files:", req.files.length)
         const { message, category } = req.body
-        console.log("to Route-Post-Upload-Create")
 
         if ((!message || !message.trim()) && (!req.files || req?.files.length === 0)) {
             return next(createError('Message or image is required', 400))
         }
 
-        console.log("to Route-Post-Upload-Create-HaveContent")
         let createFiles
         if (req.files) {
             const pendingFiles = await req.files.map(
@@ -34,7 +30,6 @@ exports.createPost = async (req, res, next) => {
             })
         }
 
-        console.log("to Route-Post-Upload-Create-HaveContent-PassReq.Files")
         const contentPost = await prisma.posts.create({
             data: {
                 userId: req.user.id,
@@ -56,19 +51,14 @@ exports.createPost = async (req, res, next) => {
             }
         })
 
-        console.log("to Route-Post-Upload-Create-HaveContent-PassReq.Files-PassPrisma")
 
         if (req.files) {
             contentPost.postFiles = contentPost.postFiles.map(postFile => postFile.file)
         }
 
-        console.log("🚀 ~ file: post-controller.js:61 ~ exports.createPost= ~ contentPost:", contentPost)
-        console.log("to Route-Post-Upload-Create-HaveContent-PassReq.Files-PassPrisma-MapResFiletoContentPost")
 
         let categoryPostMapping
         if (category) {
-            console.log("🚀 ~ file: post-controller.js:70 ~ exports.createPost= ~ category:", category)
-            console.log("🚀 ~ file: post-controller.js:70 ~ exports.createPost= ~ category:", typeof (category))
             const notFoundCategoryMessage = ": Category Not Found"
             const pendingCategoryFound = category.map(async nameCategory => {
                 const categoryRow = await prisma.category.findUnique({
@@ -107,10 +97,10 @@ exports.createPost = async (req, res, next) => {
             categoryPostMapping = await Promise.all(pendingCategoryPostMapping)
         }
 
-        console.log("🚀 ~ file: post-controller.js:105 ~ exports.createPost= ~ contentPost:", contentPost)
-        console.log("to Route-Post-Upload-Create-HaveContent-PassReq.Files-PassPrisma-MapResFiletoContentPost-PassCategoryPostCreate")
+        const resCreatePost = { ...contentPost, postCategorys: categoryPostMapping }
+        console.log("🚀 ~ file: post-controller.js:101 ~ exports.createPost= ~ resCreatePost:", resCreatePost)
 
-        res.status(201).json({ ...contentPost, category: categoryPostMapping?.map(obj => obj.categoryName) })
+        res.status(201).json(resCreatePost)
 
     } catch (err) {
         next(err)
@@ -118,3 +108,51 @@ exports.createPost = async (req, res, next) => {
 }
 
 
+exports.getAllPost = async (req, res, next) => {
+    try {
+        console.log("to getPost")
+        const userId = req.user.id
+        const allPost = await prisma.posts.findMany({
+            take: 3,
+            orderBy: [
+                {
+                    createdAt: 'desc'
+                }
+            ],
+            where: {
+                postFiles: {
+                    some: {
+                        id: {
+                            gt: 0
+                        }
+                    }
+                }
+            },
+            include: {
+                postFiles: {
+                    select: {
+                        file: true
+                    }
+                },
+                user: {
+                    select: {
+                        username: true,
+                        profileImage: true
+                    }
+                },
+                postCategorys: {
+                    select: {
+                        categoryName: true
+                    }
+                }
+            }
+        }
+        )
+
+        console.log("🚀 ~ file: post-controller.js:116 ~ exports.getPost= ~ allPost:", allPost)
+        console.log("🚀 ~ file: post-controller.js:116 ~ exports.getPost= ~ allPost:", allPost.length)
+        res.status(201).json(allPost)
+    } catch (err) {
+        next(err)
+    }
+}
