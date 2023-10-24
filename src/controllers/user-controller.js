@@ -54,9 +54,12 @@ exports.getUserById = async (req, res, next) => {
     try {
         const { error } = checkUserIdSchema.validate(req.params)
         if (error) {
+            console.log("🚀 ~ file: user-controller.js:57 ~ exports.getUserById= ~ error:", error)
             return next(error)
         }
         const userId = +req.params.userId;
+        console.log("🚀 ~ file: user-controller.js:60 ~ exports.getUserById= ~ userId:", userId)
+
         const profile = await prisma.user.findUnique({
             where: {
                 id: userId
