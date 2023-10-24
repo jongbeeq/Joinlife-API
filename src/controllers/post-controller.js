@@ -2,6 +2,7 @@
 const prisma = require("../models/prisma")
 const { uploadToCloud } = require("../utils/cloudinary-service")
 const createError = require("../utils/create-error")
+const checkPostIdSchema = require('../validators/post-validator')
 
 exports.createPost = async (req, res, next) => {
     try {
@@ -46,6 +47,21 @@ exports.createPost = async (req, res, next) => {
                 postFiles: {
                     select: {
                         file: true
+                    }
+                },
+                postCategorys: {
+                    select: {
+                        categoryName: true
+                    }
+                },
+                postComments: {
+                    include: {
+                        user: {
+                            select: {
+                                username: true,
+                                profileImage: true,
+                            }
+                        }
                     }
                 }
             }
@@ -107,7 +123,6 @@ exports.createPost = async (req, res, next) => {
     }
 }
 
-
 exports.getAllPost = async (req, res, next) => {
     try {
         console.log("to getPost")
@@ -120,7 +135,6 @@ exports.getAllPost = async (req, res, next) => {
                 }
             ],
             where: {
-                id: 102,
                 postFiles: {
                     some: {
                         id: {
@@ -137,6 +151,7 @@ exports.getAllPost = async (req, res, next) => {
                 },
                 user: {
                     select: {
+                        id: true,
                         username: true,
                         profileImage: true
                     }
@@ -163,6 +178,37 @@ exports.getAllPost = async (req, res, next) => {
         console.log("🚀 ~ file: post-controller.js:116 ~ exports.getPost= ~ allPost:", allPost)
         console.log("🚀 ~ file: post-controller.js:116 ~ exports.getPost= ~ allPost:", allPost.length)
         res.status(201).json(allPost)
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.deletePost = async (req, res, next) => {
+    try {
+        // console.log(checkPostIdSchema.validate)
+        // const { value, error } = checkPostIdSchema.validate(req.params);
+        // if (error) {
+        //     return next(error)
+        // }
+        const postId = +req.params.postId
+        console.log(req.params)
+        const existPost = await prisma.posts.findFirst({
+            where: {
+                id: postId,
+                userId: req.user.id
+            }
+        })
+
+        if (!existPost) {
+            return next(createError('Cannot delete this post', 400))
+        }
+
+        await prisma.posts.delete({
+            where: {
+                id: existPost.id
+            }
+        });
+        res.status(200).json({ message: 'Deleted' })
     } catch (err) {
         next(err)
     }

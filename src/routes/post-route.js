@@ -16,4 +16,6 @@ router.get("/",
     postMiddleware.getAllPost
 )
 
+router.delete('/:postId', authenticateMiddleware, postMiddleware.deletePost)
+
 module.exports = router;
