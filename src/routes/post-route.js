@@ -16,6 +16,19 @@ router.get("/",
     postMiddleware.getAllPost
 )
 
+router.post(
+    '/postData',
+    authenticateMiddleware,
+    postMiddleware.getPostById
+)
+
+router.patch(
+    '/',
+    authenticateMiddleware,
+    uploadMiddleware.array('image'),
+    postMiddleware.editPost
+)
+
 router.delete('/:postId', authenticateMiddleware, postMiddleware.deletePost)
 
 module.exports = router;

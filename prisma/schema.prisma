@@ -258,7 +258,7 @@ model PostFile {
 model PostCategory {
   id           Int      @id @default(autoincrement())
   postId       Int
-  post         Posts    @relation(fields: [postId], references: [id])
+  post         Posts    @relation(fields: [postId], references: [id], onDelete: Cascade)
   categoryName String
   category     Category @relation(fields: [categoryName], references: [categoryName])
 }
@@ -266,7 +266,7 @@ model PostCategory {
 model PostLike {
   id      Int      @id @default(autoincrement())
   postId  Int
-  post    Posts    @relation(fields: [postId], references: [id])
+  post    Posts    @relation(fields: [postId], references: [id], onDelete: Cascade)
   userId  Int
   user    User     @relation(fields: [userId], references: [id])
   likedAt DateTime @default(now())
@@ -275,7 +275,7 @@ model PostLike {
 model PostComment {
   id          Int      @id @default(autoincrement())
   postId      Int
-  post        Posts    @relation(fields: [postId], references: [id])
+  post        Posts    @relation(fields: [postId], references: [id], onDelete: Cascade)
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
   comment     String
@@ -285,7 +285,7 @@ model PostComment {
 model PostShare {
   id       Int      @id @default(autoincrement())
   postId   Int
-  post     Posts    @relation(fields: [postId], references: [id])
+  post     Posts    @relation(fields: [postId], references: [id], onDelete: Cascade)
   userId   Int
   user     User     @relation(fields: [userId], references: [id])
   sharedAt DateTime @default(now())
@@ -294,7 +294,7 @@ model PostShare {
 model PostView {
   id       Int      @id @default(autoincrement())
   postId   Int
-  post     Posts    @relation(fields: [postId], references: [id])
+  post     Posts    @relation(fields: [postId], references: [id], onDelete: Cascade)
   userId   Int
   user     User     @relation(fields: [userId], references: [id])
   viewedAt DateTime @default(now())
@@ -303,7 +303,7 @@ model PostView {
 model ReportPost {
   id            Int      @id @default(autoincrement())
   postId        Int
-  post          Posts    @relation(fields: [postId], references: [id])
+  post          Posts    @relation(fields: [postId], references: [id], onDelete: Cascade)
   userId        Int
   user          User     @relation(fields: [userId], references: [id])
   reportMessage String
@@ -314,7 +314,7 @@ model ReportPost {
 model StatusReportPost {
   id            Int                @id @default(autoincrement())
   postId        Int
-  post          Posts              @relation(fields: [postId], references: [id])
+  post          Posts              @relation(fields: [postId], references: [id], onDelete: Cascade)
   totalReport   Int
   status        PostAndEventStatus @default(PENDING)
   messageToUser String
