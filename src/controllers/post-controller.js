@@ -249,7 +249,7 @@ exports.deletePost = async (req, res, next) => {
 exports.editPost = async (req, res, next) => {
     try {
         const { postId, message, category } = req.body
-        console.log("🚀 ~ file: post-controller.js:215 ~ exports.editPost= ~ req.body:", req.body)
+        console.log("🚀 ~ file: post-controller.js:215 ~ exports.editPost= ~ req.body:", req.body.category)
         console.log("🚀 ~ file: post-controller.js:215 ~ exports.editPost= ~ req.files:", req.files)
 
         const existPost = await prisma.posts.findFirst({
