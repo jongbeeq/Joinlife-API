@@ -163,21 +163,11 @@ exports.getAllPost = async (req, res, next) => {
         console.log("to getPost")
         const userId = req.user.id
         const allPost = await prisma.posts.findMany({
-            // take: 3,
             orderBy: [
                 {
                     createdAt: 'desc'
                 }
             ],
-            // where: {
-            //     postFiles: {
-            //         some: {
-            //             id: {
-            //                 gt: 0
-            //             }
-            //         }
-            //     }
-            // },
             include: {
                 postFiles: {
                     select: {
@@ -210,8 +200,15 @@ exports.getAllPost = async (req, res, next) => {
         }
         )
 
-        console.log("🚀 ~ file: post-controller.js:116 ~ exports.getPost= ~ allPost:", allPost)
+        console.log("🚀 ~ file: post-controller.js:116 ~ exports.getPost= ~ allPost:", allPost.mappostCategorys)
         console.log("🚀 ~ file: post-controller.js:116 ~ exports.getPost= ~ allPost:", allPost.length)
+        allPost.forEach((item) => {
+            const newPostCategorys = item.postCategorys.map(el => el.categoryName)
+            const newPostFiles = item.postFiles.map(el => el.file)
+            item.postCategorys = newPostCategorys
+            item.postFiles = newPostFiles
+        })
+        // allPost.map(el => el.postCategorys)
         res.status(201).json(allPost)
     } catch (err) {
         next(err)
